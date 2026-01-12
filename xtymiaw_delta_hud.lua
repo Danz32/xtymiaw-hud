@@ -1,12 +1,13 @@
--- ===== XTYMIAW HUB DELTA SAFE =====
+-- ===== XTYMIAW HUD | Auto Fish Safe =====
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
 
-local rodId = "da2d51d4-8144-4190-b8ab-3492dc3ba534"
+local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685"
 local autoFish = false
-local fishingDelay = 2
-local cancelDelay = 1
+local autoSell = false
+local fishingDelay = 0.2
+local cancelDelay = 0.1
 
 -- ===== AUTO FISH LOOP =====
 task.spawn(function()
@@ -15,7 +16,16 @@ task.spawn(function()
             pcall(function() RS.Fishing_RemoteThrow:FireServer(0.5, rodId) end)
             task.wait(fishingDelay)
             pcall(function()
-                RS.Fishing.ToServer.ReelFinished:FireServer({duration=2,result="SUCCESS",insideRatio=0.8}, rodId)
+                RS.Fishing.ToServer.ReelFinished:FireServer({
+                    duration = 0.1, -- super cepat
+                    result="SUCCESS",
+                    insideRatio=1
+                }, rodId)
+            end)
+        end
+        if autoSell then
+            pcall(function()
+                RS.Economy.ToServer.SellFish:FireServer({[1]="ALL"})
             end)
         end
     end
@@ -51,28 +61,24 @@ main.BackgroundColor3 = Color3.fromRGB(25,25,25)
 main.Active = true
 main.Draggable = true
 
--- title bar
 local top = Instance.new("TextLabel", main)
 top.Size = UDim2.fromScale(1,0.15)
 top.BackgroundColor3 = Color3.fromRGB(40,40,40)
-top.Text = "xtymiaw hub - get fish"
+top.Text = "XTYMIAW HUB - GET FISH"
 top.TextColor3 = Color3.new(1,1,1)
 top.TextScaled = true
 
--- minimize button
 local min = Instance.new("TextButton", main)
 min.Size = UDim2.fromScale(0.12,0.15)
 min.Position = UDim2.fromScale(0.88,0)
 min.Text = "-"
 min.TextScaled = true
 
--- body frame
 local body = Instance.new("Frame", main)
 body.Size = UDim2.fromScale(1,0.85)
 body.Position = UDim2.fromScale(0,0.15)
 body.BackgroundTransparency = 1
 
--- helper function
 local function makeBtn(txt,y,cb)
     local b = Instance.new("TextButton", body)
     b.Size = UDim2.fromScale(0.9,0.12)
@@ -106,26 +112,25 @@ local autoBtn = makeBtn("AUTO FISH : OFF",0.05,function()
     autoBtn.Text = autoFish and "AUTO FISH : ON" or "AUTO FISH : OFF"
 end)
 
+-- AUTO SELL toggle
+local sellBtn = makeBtn("AUTO SELL : OFF",0.18,function()
+    autoSell = not autoSell
+    sellBtn.Text = autoSell and "AUTO SELL : ON" or "AUTO SELL : OFF"
+end)
+
 -- fishing delay input
-makeBox("Fishing Delay (ex:2)",0.25,function(v)
+makeBox("Fishing Delay (ex:0.2)",0.32,function(v)
     fishingDelay = v
 end)
 
 -- cancel delay input
-makeBox("Cancel Delay (ex:1)",0.42,function(v)
+makeBox("Cancel Delay (ex:0.1)",0.44,function(v)
     cancelDelay = v
 end)
 
 -- Anti Lag
-makeBtn("ANTI LAG",0.6,function()
-    AntiLag()
-end)
-
--- FPS Extreme
-makeBtn("FPS EXTREME",0.75,function()
-    AntiLag()
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-end)
+makeBtn("ANTI LAG",0.6,function() AntiLag() end)
+makeBtn("FPS EXTREME",0.75,function() AntiLag() settings().Rendering.QualityLevel=Enum.QualityLevel.Level01 end)
 
 -- minimize toggle
 local mini = false
