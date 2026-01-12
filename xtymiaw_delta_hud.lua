@@ -1,25 +1,29 @@
--- ===== XTYMIAW HUD | Auto Fish Safe =====
+-- ===== XTYMIAW HUD | GitHub Version =====
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
 
+-- ganti dengan rod ID aktif di server kamu
 local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685"
+
 local autoFish = false
 local autoSell = false
-local fishingDelay = 0.2
-local cancelDelay = 0.1
+local fishingDelay = 0.5   -- delay realistis
+local cancelDelay = 0.5
 
 -- ===== AUTO FISH LOOP =====
 task.spawn(function()
     while task.wait(cancelDelay) do
         if autoFish then
-            pcall(function() RS.Fishing_RemoteThrow:FireServer(0.5, rodId) end)
+            pcall(function()
+                RS.Fishing_RemoteThrow:FireServer(0.5, rodId)
+            end)
             task.wait(fishingDelay)
             pcall(function()
                 RS.Fishing.ToServer.ReelFinished:FireServer({
-                    duration = 0.1, -- super cepat
-                    result="SUCCESS",
-                    insideRatio=1
+                    duration = 1.5,  -- realistis
+                    result = "SUCCESS",
+                    insideRatio = 0.8
                 }, rodId)
             end)
         end
@@ -119,12 +123,12 @@ local sellBtn = makeBtn("AUTO SELL : OFF",0.18,function()
 end)
 
 -- fishing delay input
-makeBox("Fishing Delay (ex:0.2)",0.32,function(v)
+makeBox("Fishing Delay (ex:0.5)",0.32,function(v)
     fishingDelay = v
 end)
 
 -- cancel delay input
-makeBox("Cancel Delay (ex:0.1)",0.44,function(v)
+makeBox("Cancel Delay (ex:0.5)",0.44,function(v)
     cancelDelay = v
 end)
 
