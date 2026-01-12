@@ -3,26 +3,38 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
 
-local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685" -- ganti sesuai rod kamu
+-- Rod ID sesuai rod kamu
+local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685"
+
+-- Status toggle
 local autoFish = false
 local autoSell = false
-local fishingDelay = 0.2
-local cancelDelay = 0.1
 
--- ===== AUTO FISH LOOP =====
+-- Delay / duration
+local fishingDelay = 2       -- jeda lempar kail
+local cancelDelay = 0.35     -- jeda sebelum loop ulang
+local reelDuration = 3.8     -- durasi reel agar ikan nyangkut
+
+-- ===== AUTO FISH & SELL LOOP =====
 task.spawn(function()
-    while task.wait(cancelDelay) do
+    while true do
+        task.wait(cancelDelay)
         if autoFish then
-            pcall(function() RS.Fishing_RemoteThrow:FireServer(0.5, rodId) end)
+            pcall(function()
+                RS.Fishing_RemoteThrow:FireServer(0.5, rodId)
+            end)
+
             task.wait(fishingDelay)
+
             pcall(function()
                 RS.Fishing.ToServer.ReelFinished:FireServer({
-                    duration = 0.1, -- super cepat
+                    duration = reelDuration,
                     result="SUCCESS",
                     insideRatio=1
                 }, rodId)
             end)
         end
+
         if autoSell then
             pcall(function()
                 RS.Economy.ToServer.SellFish:FireServer({[1]="ALL"})
@@ -81,6 +93,7 @@ body.Size = UDim2.fromScale(1,0.85)
 body.Position = UDim2.fromScale(0,0.15)
 body.BackgroundTransparency = 1
 
+-- ===== Helper Functions =====
 local function makeBtn(txt,y,cb)
     local b = Instance.new("TextButton", body)
     b.Size = UDim2.fromScale(0.9,0.12)
@@ -108,27 +121,24 @@ local function makeBox(ph,y,cb)
     end)
 end
 
--- AUTO FISH toggle
+-- ===== Buttons & Inputs =====
 local autoBtn = makeBtn("AUTO FISH : OFF",0.05,function()
     autoFish = not autoFish
     autoBtn.Text = autoFish and "AUTO FISH : ON" or "AUTO FISH : OFF"
 end)
 
--- AUTO SELL toggle
 local sellBtn = makeBtn("AUTO SELL : OFF",0.18,function()
     autoSell = not autoSell
     sellBtn.Text = autoSell and "AUTO SELL : ON" or "AUTO SELL : OFF"
 end)
 
--- Fishing delay input
-makeBox("Fishing Delay (ex:0.2)",0.32,function(v) fishingDelay = v end)
-makeBox("Cancel Delay (ex:0.1)",0.44,function(v) cancelDelay = v end)
+makeBox("Fishing Delay (ex:2)",0.32,function(v) fishingDelay = v end)
+makeBox("Cancel Delay (ex:0.35)",0.44,function(v) cancelDelay = v end)
 
--- Anti Lag / FPS Extreme
 makeBtn("ANTI LAG",0.6,function() AntiLag() end)
 makeBtn("FPS EXTREME",0.75,function() AntiLag() settings().Rendering.QualityLevel=Enum.QualityLevel.Level01 end)
 
--- Minimize toggle
+-- ===== Minimize Toggle =====
 local mini = false
 min.MouseButton1Click:Connect(function()
     mini = not mini
