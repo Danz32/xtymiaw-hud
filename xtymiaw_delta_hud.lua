@@ -1,29 +1,25 @@
--- ===== XTYMIAW HUD | GitHub Version =====
+-- ===== XTYMIAW HUD DELTA SAFE | Get Fish =====
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
 
--- ganti dengan rod ID aktif di server kamu
-local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685"
-
+local rodId = "f748fb1a-337a-4e80-a73f-3b4d0ad37685" -- ganti sesuai rod kamu
 local autoFish = false
 local autoSell = false
-local fishingDelay = 0.5   -- delay realistis
-local cancelDelay = 0.5
+local fishingDelay = 0.2
+local cancelDelay = 0.1
 
 -- ===== AUTO FISH LOOP =====
 task.spawn(function()
     while task.wait(cancelDelay) do
         if autoFish then
-            pcall(function()
-                RS.Fishing_RemoteThrow:FireServer(0.5, rodId)
-            end)
+            pcall(function() RS.Fishing_RemoteThrow:FireServer(0.5, rodId) end)
             task.wait(fishingDelay)
             pcall(function()
                 RS.Fishing.ToServer.ReelFinished:FireServer({
-                    duration = 1.5,  -- realistis
-                    result = "SUCCESS",
-                    insideRatio = 0.8
+                    duration = 0.1, -- super cepat
+                    result="SUCCESS",
+                    insideRatio=1
                 }, rodId)
             end)
         end
@@ -55,8 +51,10 @@ local function AntiLag()
 end
 
 -- ===== HUD =====
-local gui = Instance.new("ScreenGui", game.CoreGui)
+task.wait(1) -- tunggu PlayerGui siap
+local gui = Instance.new("ScreenGui")
 gui.Name = "xtymiawHUD"
+gui.Parent = LP:WaitForChild("PlayerGui")
 
 local main = Instance.new("Frame", gui)
 main.Size = UDim2.fromScale(0.6,0.5)
@@ -122,21 +120,15 @@ local sellBtn = makeBtn("AUTO SELL : OFF",0.18,function()
     sellBtn.Text = autoSell and "AUTO SELL : ON" or "AUTO SELL : OFF"
 end)
 
--- fishing delay input
-makeBox("Fishing Delay (ex:0.5)",0.32,function(v)
-    fishingDelay = v
-end)
+-- Fishing delay input
+makeBox("Fishing Delay (ex:0.2)",0.32,function(v) fishingDelay = v end)
+makeBox("Cancel Delay (ex:0.1)",0.44,function(v) cancelDelay = v end)
 
--- cancel delay input
-makeBox("Cancel Delay (ex:0.5)",0.44,function(v)
-    cancelDelay = v
-end)
-
--- Anti Lag
+-- Anti Lag / FPS Extreme
 makeBtn("ANTI LAG",0.6,function() AntiLag() end)
 makeBtn("FPS EXTREME",0.75,function() AntiLag() settings().Rendering.QualityLevel=Enum.QualityLevel.Level01 end)
 
--- minimize toggle
+-- Minimize toggle
 local mini = false
 min.MouseButton1Click:Connect(function()
     mini = not mini
