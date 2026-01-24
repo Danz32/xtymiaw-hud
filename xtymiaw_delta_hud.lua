@@ -1,5 +1,3 @@
-warn("XTYMIAW HUD LOADED")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -135,10 +133,67 @@ getgenv().XTYMIAW_OFF = function()
     print("[xtymiaw] AUTO FISH OFF")
 end
 
-getgenv().XTYMIAW_SET = function(throwDelay, reelDelay, duration)
-    if throwDelay then Settings.THROW_DELAY = throwDelay end
-    if reelDelay then Settings.REEL_DELAY = reelDelay end
-    if duration then Settings.DURATION = duration end
-    SaveSetting()
-    print("[xtymiaw] SETTING UPDATED & SAVED")
-end
+-- =========================
+-- HUB KECIL + DRAG
+-- =========================
+
+pcall(function()
+    if game.CoreGui:FindFirstChild("XTYMIAW_HUB") then
+        game.CoreGui.XTYMIAW_HUB:Destroy()
+    end
+end)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "XTYMIAW_HUB"
+gui.Parent = game.CoreGui
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.fromScale(0.18, 0.16)
+frame.Position = UDim2.fromScale(0.03, 0.3)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0,12)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.fromScale(1, 0.28)
+title.Text = "XTYMIAW FISH"
+title.TextScaled = true
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+
+local onBtn = Instance.new("TextButton", frame)
+onBtn.Size = UDim2.fromScale(0.85, 0.28)
+onBtn.Position = UDim2.fromScale(0.075, 0.35)
+onBtn.Text = "ON"
+onBtn.TextScaled = true
+onBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+onBtn.TextColor3 = Color3.new(1,1,1)
+
+local c1 = Instance.new("UICorner", onBtn)
+c1.CornerRadius = UDim.new(0,10)
+
+local offBtn = Instance.new("TextButton", frame)
+offBtn.Size = UDim2.fromScale(0.85, 0.28)
+offBtn.Position = UDim2.fromScale(0.075, 0.67)
+offBtn.Text = "OFF"
+offBtn.TextScaled = true
+offBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+offBtn.TextColor3 = Color3.new(1,1,1)
+
+local c2 = Instance.new("UICorner", offBtn)
+c2.CornerRadius = UDim.new(0,10)
+
+onBtn.MouseButton1Click:Connect(function()
+    getgenv().XTYMIAW_ON()
+    onBtn.Text = "ON ✓"
+end)
+
+offBtn.MouseButton1Click:Connect(function()
+    getgenv().XTYMIAW_OFF()
+    onBtn.Text = "ON"
+end)
