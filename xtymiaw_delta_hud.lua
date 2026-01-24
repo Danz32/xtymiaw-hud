@@ -76,7 +76,7 @@ local function autoReel()
 	local tool = getRod()
 	if not tool then return end
 	ReelRemote:FireServer({
-		duration = Settings.DURATION + math.random()*0.2,
+		duration = Settings.DURATION + math.random()*1.5,
 		result = "SUCCESS",
 		insideRatio = Settings.INSIDE_RATIO
 	}, getUUID(tool))
@@ -85,7 +85,7 @@ end
 if StartBiteRemote then
 	StartBiteRemote.OnClientEvent:Connect(function()
 		if not Settings.AUTO_FISH then return end
-		task.wait(Settings.REEL_DELAY + math.random()*0.1)
+		task.wait(Settings.REEL_DELAY + math.random()*0.3)
 		autoReel()
 	end)
 end
